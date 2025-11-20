@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Bibliothèque de Films Intégrés</title>
+    <!-- Chargement de Tailwind CSS pour un style moderne et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configuration de base pour le thème sombre */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Bleu très foncé (slate-900) */
+        }
+        /* Style pour assurer la réactivité de l'iframe (ratio 16:9) */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio (9 / 16 * 100) */
+            background-color: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* Style pour les cartes de films */
+        .film-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+        .film-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 text-white">
+
+    <header class="text-center mb-10 bg-gray-800/50 p-6 rounded-xl shadow-lg">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-400">
+            🎬 Ma Salle de Cinéma Personnelle
+        </h1>
+        <p class="text-gray-400 mt-2 text-lg">
+            Ajoutez et regardez vos films favoris en intégrant simplement leur lien.
+        </p>
+    </header>
+
+    <!-- ZONE DES FILTRES ET DE LA RECHERCHE -->
+    <div class="max-w-7xl mx-auto mb-8 flex flex-col sm:flex-row gap-4">
+        <!-- Barre de Recherche -->
+        <div class="flex-grow">
+            <input
+                type="text"
+                id="search-input"
+                oninput="filterMovies()"
+                placeholder="Rechercher un film par titre..."
+                class="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent border-none outline-none transition duration-150"
+            >
+        </div>
+
+        <!-- Filtrage par Catégorie -->
+        <div>
+            <select
+                id="category-filter"
+                onchange="filterMovies()"
+                class="w-full sm:w-48 p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent border-none outline-none cursor-pointer transition duration-150"
+            >
+                <option value="all">Toutes les Catégories</option>
+                <!-- Ajoutez vos catégories ici (Ex: Action, Science-fiction, etc.) -->
+                <option value="action">Action</option>
+                <option value="sci-fi">Science-fiction</option>
+                <option value="animation">Animation</option>
+            </select>
+        </div>
+    </div>
+    <!-- FIN ZONE DES FILTRES ET DE LA RECHERCHE -->
+
+
+    <!--
+        ZONE PRINCIPALE DES FILMS
+        Chaque div film doit avoir un attribut 'data-category' pour le filtrage.
+        Utilisation d'une grille responsive.
+    -->
+    <main id="movies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+
+        <!-- *************************************************************** -->
+        <!-- ********* EXEMPLE 1 : Film intégré (Hunger Games) ************* -->
+        <!-- *************************************************************** -->
+        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="Hunger Games - La Révolte, 2ème Partie (2015)" data-category="action">
+            <h2 class="text-2xl font-bold mb-4 text-blue-300">
+                Hunger Games - La Révolte, 2ème Partie (2015)
+            </h2>
+            <div class="video-container rounded-lg overflow-hidden border-2 border-blue-600/50">
+                <!-- Lien d'intégration (l'iframe SRC) -->
+                <iframe
+                    src="https://uqload.cx/embed-3mddbqndnykc.html"
+                    frameborder="0"
+                    scrolling="no"
+                    allowfullscreen
+                    title="Hunger Games - La Révolte, 2ème Partie (2015)"
+                ></iframe>
+            </div>
+            <p class="mt-4 text-sm text-gray-400">
+                Ce film est le dernier chapitre de la saga Hunger Games. Catégorie : **Action**.
+            </p>
+        </div>
+        
+        <!-- *************************************************************** -->
+        <!-- ********* EXEMPLE 2 : Film (Science-fiction) ****************** -->
+        <!-- *************************************************************** -->
+        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="Voyage Vers Mars 3000" data-category="sci-fi">
+            <h2 class="text-2xl font-bold mb-4 text-green-300">
+                Voyage Vers Mars 3000
+            </h2>
+            <div class="video-container rounded-lg overflow-hidden border-2 border-green-600/50">
+                <!-- Lien d'intégration -->
+                <iframe
+                    src="https://placehold.co/1920x1080/10b981/000000?text=LIEN%20DE%20SCI-FI"
+                    frameborder="0"
+                    scrolling="no"
+                    allowfullscreen
+                    title="Voyage Vers Mars 3000"
+                ></iframe>
+            </div>
+            <p class="mt-4 text-sm text-gray-400">
+                Un classique de la science-fiction. Catégorie : **Sci-fi**.
+            </p>
+        </div>
+
+        <!-- *************************************************************** -->
+        <!-- ********* EXEMPLE 3 : Film (Animation) ************************ -->
+        <!-- *************************************************************** -->
+        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="L'Aventure du Petit Dragon" data-category="animation">
+            <h2 class="text-2xl font-bold mb-4 text-red-300">
+                L'Aventure du Petit Dragon
+            </h2>
+            <div class="video-container rounded-lg overflow-hidden border-2 border-red-600/50">
+                <!-- Lien d'intégration -->
+                <iframe
+                    src="https://placehold.co/1920x1080/ef4444/000000?text=LIEN%20D'ANIMATION"
+                    frameborder="0"
+                    scrolling="no"
+                    allowfullscreen
+                    title="L'Aaventure du Petit Dragon"
+                ></iframe>
+            </div>
+            <p class="mt-4 text-sm text-gray-400">
+                Un film d'animation pour toute la famille. Catégorie : **Animation**.
+            </p>
+        </div>
+
+
+        <!-- *************************************************************** -->
+        <!-- ********* PATRON À DUPLIQUER POUR AJOUTER UN NOUVEAU FILM ***** -->
+        <!-- *************************************************************** -->
+        <div class="film-card bg-gray-800 p-6 rounded-xl border-4 border-dashed border-yellow-500/50" data-title="TITRE A CHANGER" data-category="action">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-300">
+                TITRE DU FILM ICI (À DUPLIQUER)
+            </h2>
+            <div class="video-container rounded-lg overflow-hidden border-2 border-yellow-700">
+                <!--
+                    INSTRUCTIONS :
+                    1. Copiez TOUT ce bloc <div>.
+                    2. Collez-le.
+                    3. Changez le 'data-title' et le texte du <h2>.
+                    4. Changez le 'data-category' par une catégorie existante (action, sci-fi, animation, etc.).
+                    5. REMPLACEZ le lien dans 'src="..."' ci-dessous par votre VRAI lien d'intégration (iframe src).
+                -->
+                <iframe
+                    src="https://placehold.co/1920x1080/000000/FFFFFF?text=LIEN%20A%20CHANGER"
+                    frameborder="0"
+                    scrolling="no"
+                    allowfullscreen
+                    title="Patron de Film"
+                ></iframe>
+            </div>
+            <p class="mt-4 text-sm text-gray-400">
+                Ceci est le patron. Une fois dupliqué, n'oubliez pas de mettre une description et la bonne catégorie.
+            </p>
+        </div>
+        <!-- *************************************************************** -->
+        <!-- ******************** FIN DU PATRON D'EXEMPLE ****************** -->
+        <!-- *************************************************************** -->
+        
+    </main>
+
+    <footer class="text-center mt-12 text-gray-500 text-sm">
+        <p>Bibliothèque de films personnelle. Filtrage activé par JavaScript.</p>
+    </footer>
+
+    <script>
+        // Fonction pour filtrer les films en fonction de la recherche et de la catégorie
+        function filterMovies() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const films = document.getElementById('movies-container').children;
+
+            for (let i = 0; i < films.length; i++) {
+                const film = films[i];
+                
+                // Vérifie si l'élément est une carte de film valide (n'est pas un commentaire ou autre)
+                if (film.nodeType !== 1 || !film.hasAttribute('data-title')) continue;
+
+                // Récupère le titre et la catégorie du film
+                const title = film.getAttribute('data-title').toLowerCase();
+                const filmCategory = film.getAttribute('data-category').toLowerCase();
+                
+                // Vérifie si le titre correspond au terme de recherche
+                const titleMatch = title.includes(searchTerm);
+                
+                // Vérifie si la catégorie correspond au filtre sélectionné
+                const categoryMatch = (category === 'all' || filmCategory === category);
+
+                // Affiche ou masque le film
+                if (titleMatch && categoryMatch) {
+                    film.style.display = 'block'; // Affiche la carte
+                } else {
+                    film.style.display = 'none';  // Masque la carte
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
