@@ -25,15 +25,42 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border: none; /* Supprime la bordure par défaut de l'iframe */
         }
         /* Style pour les cartes de films */
         .film-card {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
             transition: all 0.3s ease;
+            cursor: pointer; /* Indique que l'élément est cliquable */
+            border: 2px solid transparent;
         }
         .film-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            border-color: #3b82f6; /* Bordure bleue au survol */
+        }
+        /* Style pour la modale */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95); /* Fond très sombre */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Assure que la modale est au-dessus de tout */
+        }
+        .modal-content {
+            background-color: #1e293b; /* Gris foncé */
+            max-width: 90vw; /* Utilise 90% de la largeur de l'écran */
+            max-height: 90vh; /* Utilise 90% de la hauteur de l'écran */
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -44,7 +71,7 @@
             🎬 Ma Salle de Cinéma Personnelle
         </h1>
         <p class="text-gray-400 mt-2 text-lg">
-            Ajoutez et regardez vos films favoris en intégrant simplement leur lien.
+            Cliquez sur une carte pour lancer le film dans le lecteur intégré.
         </p>
     </header>
 
@@ -81,51 +108,48 @@
 
     <!--
         ZONE PRINCIPALE DES FILMS
-        Chaque div film doit avoir un attribut 'data-category' pour le filtrage.
-        Utilisation d'une grille responsive.
+        Chaque div film doit être cliquable et appeler openModal.
     -->
-    <main id="movies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+    <main id="movies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
 
         <!-- *************************************************************** -->
         <!-- ********* EXEMPLE 1 : Film intégré (Hunger Games) ************* -->
+        <!-- Note: Nous passons le titre et le lien SRC à la fonction openModal() -->
         <!-- *************************************************************** -->
-        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="Hunger Games - La Révolte, 2ème Partie (2015)" data-category="action">
-            <h2 class="text-2xl font-bold mb-4 text-blue-300">
+        <div 
+            class="film-card bg-gray-800 p-4 rounded-xl" 
+            data-title="Hunger Games - La Révolte, 2ème Partie (2015)" 
+            data-category="action"
+            onclick="openModal('Hunger Games - La Révolte, 2ème Partie (2015)', 'https://uqload.cx/embed-3mddbqndnykc.html')"
+        >
+            <h2 class="text-xl font-bold mb-2 text-blue-300 truncate">
                 Hunger Games - La Révolte, 2ème Partie (2015)
             </h2>
-            <div class="video-container rounded-lg overflow-hidden border-2 border-blue-600/50">
-                <!-- Lien d'intégration (l'iframe SRC) -->
-                <iframe
-                    src="https://uqload.cx/embed-3mddbqndnykc.html"
-                    frameborder="0"
-                    scrolling="no"
-                    allowfullscreen
-                    title="Hunger Games - La Révolte, 2ème Partie (2015)"
-                ></iframe>
+            <div class="video-container rounded-lg overflow-hidden">
+                <!-- Placeholder visuel pour l'aperçu du film -->
+                <img src="https://placehold.co/640x360/1e40af/ffffff?text=Cliquer%20pour%20Regarder" alt="Placeholder pour Hunger Games" class="w-full h-full object-cover">
             </div>
-            <p class="mt-4 text-sm text-gray-400">
-                Ce film est le dernier chapitre de la saga Hunger Games. Catégorie : **Action**.
+            <p class="mt-3 text-sm text-gray-400">
+                Le dernier chapitre de la saga. Catégorie : **Action**.
             </p>
         </div>
         
         <!-- *************************************************************** -->
         <!-- ********* EXEMPLE 2 : Film (Science-fiction) ****************** -->
         <!-- *************************************************************** -->
-        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="Voyage Vers Mars 3000" data-category="sci-fi">
-            <h2 class="text-2xl font-bold mb-4 text-green-300">
+        <div 
+            class="film-card bg-gray-800 p-4 rounded-xl" 
+            data-title="Voyage Vers Mars 3000" 
+            data-category="sci-fi"
+            onclick="openModal('Voyage Vers Mars 3000', 'https://placehold.co/1920x1080/10b981/000000?text=LIEN%20DE%20SCI-FI')"
+        >
+            <h2 class="text-xl font-bold mb-2 text-green-300 truncate">
                 Voyage Vers Mars 3000
             </h2>
-            <div class="video-container rounded-lg overflow-hidden border-2 border-green-600/50">
-                <!-- Lien d'intégration -->
-                <iframe
-                    src="https://placehold.co/1920x1080/10b981/000000?text=LIEN%20DE%20SCI-FI"
-                    frameborder="0"
-                    scrolling="no"
-                    allowfullscreen
-                    title="Voyage Vers Mars 3000"
-                ></iframe>
+            <div class="video-container rounded-lg overflow-hidden">
+                <img src="https://placehold.co/640x360/065f46/ffffff?text=Cliquer%20pour%20Regarder%20Sci-Fi" alt="Placeholder pour Sci-Fi" class="w-full h-full object-cover">
             </div>
-            <p class="mt-4 text-sm text-gray-400">
+            <p class="mt-3 text-sm text-gray-400">
                 Un classique de la science-fiction. Catégorie : **Sci-fi**.
             </p>
         </div>
@@ -133,21 +157,19 @@
         <!-- *************************************************************** -->
         <!-- ********* EXEMPLE 3 : Film (Animation) ************************ -->
         <!-- *************************************************************** -->
-        <div class="film-card bg-gray-800 p-6 rounded-xl" data-title="L'Aventure du Petit Dragon" data-category="animation">
-            <h2 class="text-2xl font-bold mb-4 text-red-300">
+        <div 
+            class="film-card bg-gray-800 p-4 rounded-xl" 
+            data-title="L'Aventure du Petit Dragon" 
+            data-category="animation"
+            onclick="openModal('L\'Aventure du Petit Dragon', 'https://placehold.co/1920x1080/ef4444/000000?text=LIEN%20D\'ANIMATION')"
+        >
+            <h2 class="text-xl font-bold mb-2 text-red-300 truncate">
                 L'Aventure du Petit Dragon
             </h2>
-            <div class="video-container rounded-lg overflow-hidden border-2 border-red-600/50">
-                <!-- Lien d'intégration -->
-                <iframe
-                    src="https://placehold.co/1920x1080/ef4444/000000?text=LIEN%20D'ANIMATION"
-                    frameborder="0"
-                    scrolling="no"
-                    allowfullscreen
-                    title="L'Aaventure du Petit Dragon"
-                ></iframe>
+            <div class="video-container rounded-lg overflow-hidden">
+                <img src="https://placehold.co/640x360/991b1b/ffffff?text=Cliquer%20pour%20Regarder%20Animé" alt="Placeholder pour Animation" class="w-full h-full object-cover">
             </div>
-            <p class="mt-4 text-sm text-gray-400">
+            <p class="mt-3 text-sm text-gray-400">
                 Un film d'animation pour toute la famille. Catégorie : **Animation**.
             </p>
         </div>
@@ -156,29 +178,21 @@
         <!-- *************************************************************** -->
         <!-- ********* PATRON À DUPLIQUER POUR AJOUTER UN NOUVEAU FILM ***** -->
         <!-- *************************************************************** -->
-        <div class="film-card bg-gray-800 p-6 rounded-xl border-4 border-dashed border-yellow-500/50" data-title="TITRE A CHANGER" data-category="action">
-            <h2 class="text-2xl font-bold mb-4 text-yellow-300">
+        <div 
+            class="film-card bg-gray-800 p-4 rounded-xl border-4 border-dashed border-yellow-500/50" 
+            data-title="TITRE A CHANGER" 
+            data-category="action"
+            onclick="openModal('TITRE A CHANGER', 'LIEN D\'INTÉGRATION COMPLET ICI')"
+        >
+            <h2 class="text-xl font-bold mb-2 text-yellow-300 truncate">
                 TITRE DU FILM ICI (À DUPLIQUER)
             </h2>
-            <div class="video-container rounded-lg overflow-hidden border-2 border-yellow-700">
-                <!--
-                    INSTRUCTIONS :
-                    1. Copiez TOUT ce bloc <div>.
-                    2. Collez-le.
-                    3. Changez le 'data-title' et le texte du <h2>.
-                    4. Changez le 'data-category' par une catégorie existante (action, sci-fi, animation, etc.).
-                    5. REMPLACEZ le lien dans 'src="..."' ci-dessous par votre VRAI lien d'intégration (iframe src).
-                -->
-                <iframe
-                    src="https://placehold.co/1920x1080/000000/FFFFFF?text=LIEN%20A%20CHANGER"
-                    frameborder="0"
-                    scrolling="no"
-                    allowfullscreen
-                    title="Patron de Film"
-                ></iframe>
+            <div class="video-container rounded-lg overflow-hidden">
+                <!-- Vous pouvez remplacer cette image par une vraie vignette si vous en avez une. -->
+                <img src="https://placehold.co/640x360/b45309/ffffff?text=CLIQUEZ%20POUR%20VOIR" alt="Placeholder pour Nouveau Film" class="w-full h-full object-cover">
             </div>
-            <p class="mt-4 text-sm text-gray-400">
-                Ceci est le patron. Une fois dupliqué, n'oubliez pas de mettre une description et la bonne catégorie.
+            <p class="mt-3 text-sm text-gray-400">
+                Ceci est le patron. Modifiez le titre, la catégorie et surtout le lien dans la fonction **onclick**.
             </p>
         </div>
         <!-- *************************************************************** -->
@@ -188,11 +202,106 @@
     </main>
 
     <footer class="text-center mt-12 text-gray-500 text-sm">
-        <p>Bibliothèque de films personnelle. Filtrage activé par JavaScript.</p>
+        <p>Bibliothèque de films personnelle. Lecteur intégré par modale.</p>
     </footer>
 
+    <!-- *************************************************************** -->
+    <!-- ********************* MODALE DU LECTEUR VIDÉO ******************* -->
+    <!-- *************************************************************** -->
+    <div id="movie-modal" class="modal-overlay hidden">
+        <div class="modal-content w-full max-w-4xl lg:max-w-6xl">
+            
+            <!-- Bouton de fermeture -->
+            <button 
+                onclick="closeModal()" 
+                class="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xl transition duration-150 z-20"
+                aria-label="Fermer le lecteur"
+            >
+                &times;
+            </button>
+
+            <h2 id="modal-title" class="text-3xl font-extrabold mb-4 text-blue-400 text-center pt-2">
+                <!-- Le titre du film sera injecté ici -->
+            </h2>
+
+            <!-- Conteneur pour le lecteur (iframe) -->
+            <div class="video-container rounded-xl overflow-hidden shadow-2xl">
+                <iframe
+                    id="modal-iframe"
+                    src=""
+                    frameborder="0"
+                    scrolling="no"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowfullscreen
+                    title="Lecteur Vidéo Intégré"
+                ></iframe>
+            </div>
+
+            <p class="text-sm text-gray-400 mt-4 text-center">
+                Ce contenu est diffusé via un lecteur intégré (iframe).
+            </p>
+        </div>
+    </div>
+    <!-- *************************************************************** -->
+    <!-- ******************* FIN MODALE DU LECTEUR VIDÉO ***************** -->
+    <!-- *************************************************************** -->
+
     <script>
-        // Fonction pour filtrer les films en fonction de la recherche et de la catégorie
+        /**
+         * Ouvre la modale du lecteur vidéo et injecte le lien d'intégration.
+         * @param {string} title - Le titre du film.
+         * @param {string} src - Le lien SRC de l'iframe à charger.
+         */
+        function openModal(title, src) {
+            const modal = document.getElementById('movie-modal');
+            const iframe = document.getElementById('modal-iframe');
+            const titleElement = document.getElementById('modal-title');
+
+            // 1. Injecte le contenu
+            titleElement.textContent = title;
+            iframe.src = src; // Charge la vidéo
+
+            // 2. Affiche la modale
+            modal.classList.remove('hidden');
+
+            // Empêche le défilement du corps de la page
+            document.body.style.overflow = 'hidden';
+
+            // Ajoute un écouteur pour fermer avec la touche ESC
+            document.addEventListener('keydown', handleEscape);
+        }
+
+        /**
+         * Ferme la modale du lecteur vidéo.
+         */
+        function closeModal() {
+            const modal = document.getElementById('movie-modal');
+            const iframe = document.getElementById('modal-iframe');
+
+            // 1. Cache la modale
+            modal.classList.add('hidden');
+
+            // 2. Stoppe la vidéo en retirant la source de l'iframe
+            // IMPORTANT : Ceci stoppe la lecture audio/vidéo !
+            iframe.src = ""; 
+
+            // Rétablit le défilement du corps de la page
+            document.body.style.overflow = '';
+
+            // Retire l'écouteur de la touche ESC
+            document.removeEventListener('keydown', handleEscape);
+        }
+
+        /**
+         * Gère la fermeture avec la touche Échappe (ESC).
+         */
+        function handleEscape(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        }
+        
+        // Fonction de filtrage (inchangée, mais mise à jour pour le nouveau HTML des cartes)
         function filterMovies() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const category = document.getElementById('category-filter').value;
@@ -201,27 +310,32 @@
             for (let i = 0; i < films.length; i++) {
                 const film = films[i];
                 
-                // Vérifie si l'élément est une carte de film valide (n'est pas un commentaire ou autre)
                 if (film.nodeType !== 1 || !film.hasAttribute('data-title')) continue;
 
-                // Récupère le titre et la catégorie du film
                 const title = film.getAttribute('data-title').toLowerCase();
                 const filmCategory = film.getAttribute('data-category').toLowerCase();
                 
-                // Vérifie si le titre correspond au terme de recherche
                 const titleMatch = title.includes(searchTerm);
-                
-                // Vérifie si la catégorie correspond au filtre sélectionné
                 const categoryMatch = (category === 'all' || filmCategory === category);
 
-                // Affiche ou masque le film
                 if (titleMatch && categoryMatch) {
-                    film.style.display = 'block'; // Affiche la carte
+                    film.style.display = 'block'; 
                 } else {
-                    film.style.display = 'none';  // Masque la carte
+                    film.style.display = 'none';  
                 }
             }
         }
+
+        // Ajout d'un écouteur pour fermer la modale si l'utilisateur clique en dehors de son contenu
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalOverlay = document.getElementById('movie-modal');
+            modalOverlay.addEventListener('click', (event) => {
+                // Si l'utilisateur clique sur l'overlay (l'extérieur de la modale)
+                if (event.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+        });
     </script>
 
 </body>
