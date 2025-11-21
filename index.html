@@ -110,75 +110,13 @@
     <script>
         // --- 1. DONNÉES DES FILMS ---
         const movies = [
-            // Note: Utilisez des ID YouTube pour la lecture
+            // FILM UNIQUE AJOUTÉ PAR L'UTILISATEUR
             {
                 id: 1,
-                title: "Le Voyage de Chihiro",
-                youtubeId: "ByXuk9QqzmE", // Exemple de bande-annonce
-                imageUrl: "https://placehold.co/300x450/4A90E2/ffffff?text=Chihiro+Affiche"
-            },
-            {
-                id: 2,
-                title: "Inception",
-                youtubeId: "8hP9D6BjmPM",
-                imageUrl: "https://placehold.co/300x450/F5A623/ffffff?text=Inception+Affiche"
-            },
-            {
-                id: 3,
-                title: "Parasite",
-                youtubeId: "Wn9x226Z52Y",
-                imageUrl: "https://placehold.co/300x450/7ED321/ffffff?text=Parasite+Affiche"
-            },
-            {
-                id: 4,
-                title: "Interstellar",
-                youtubeId: "qc-iB2H44Xg",
-                imageUrl: "https://placehold.co/300x450/4C4C4C/ffffff?text=Interstellar+Affiche"
-            },
-            {
-                id: 5,
-                title: "Mad Max: Fury Road",
-                youtubeId: "H9P4s50d_A8",
-                imageUrl: "https://placehold.co/300x450/D0021B/ffffff?text=Mad+Max+Affiche"
-            },
-            {
-                id: 6,
-                title: "Arrival",
-                youtubeId: "7W-m81g5j2Q",
-                imageUrl: "https://placehold.co/300x450/9B59B6/ffffff?text=Arrival+Affiche"
-            },
-            {
-                id: 7,
-                title: "Blade Runner 2049",
-                youtubeId: "g61Jd1qF03Y",
-                imageUrl: "https://placehold.co/300x450/3498DB/ffffff?text=Blade+Runner+Affiche"
-            },
-            {
-                id: 8,
-                title: "Whiplash",
-                youtubeId: "zVp32K1d4dM",
-                imageUrl: "https://placehold.co/300x450/1ABC9C/ffffff?text=Whiplash+Affiche"
-            },
-            {
-                id: 9,
-                title: "Everything Everywhere All at Once",
-                youtubeId: "VxS2vJ3_x50",
-                imageUrl: "https://placehold.co/300x450/FFD700/000000?text=EEAAO+Affiche"
-            },
-            {
-                id: 10,
-                title: "Dune (2021)",
-                youtubeId: "8g18jFfC8sM",
-                imageUrl: "https://placehold.co/300x450/000000/ffffff?text=Dune+Affiche"
-            },
-            // NOUVEAU FILM AJOUTÉ PAR L'UTILISATEUR
-            {
-                id: 11,
-                title: "Le Nouveau Film (Exemple)",
-                youtubeId: "81Oa-D0c6gI", // Trailer sécurisé d'un film populaire (Elemental)
-                imageUrl: "https://placehold.co/300x450/4567B4/ffffff?text=Nouveau+Film"
+                title: "Le Film Mystère (UQload)",
+                embedUrl: "https://uqload.cx/embed-h2jymd6v6uvk.html",
+                imageUrl: "https://placehold.co/300x450/3498DB/ffffff?text=Film+Mystère"
             }
-            // Ajoutez plus de films ici
         ];
 
         const movieGrid = document.getElementById('movieGrid');
@@ -192,13 +130,13 @@
 
         /**
          * Crée et retourne l'élément DOM pour une carte de film.
-         * @param {Object} movie - L'objet film contenant title, imageUrl, et youtubeId.
+         * @param {Object} movie - L'objet film contenant title, imageUrl, et embedUrl.
          */
         function createMovieCard(movie) {
             const card = document.createElement('div');
             card.className = 'film-card bg-[#1c1c1c] rounded-xl overflow-hidden shadow-xl cursor-pointer hover:shadow-[#4A90E2]/40 transition duration-300';
             card.setAttribute('data-title', movie.title);
-            card.setAttribute('data-youtube-id', movie.youtubeId);
+            card.setAttribute('data-embed-url', movie.embedUrl);
 
             card.innerHTML = `
                 <div class="aspect-w-2 aspect-h-3 overflow-hidden">
@@ -251,8 +189,8 @@
          * @param {Object} movie - Le film à lire.
          */
         function openModal(movie) {
-            // Construit l'URL de l'embed YouTube avec l'autoplay
-            const embedUrl = `https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&controls=1&modestbranding=1&rel=0`;
+            // Utilise l'URL d'intégration direct
+            const embedUrl = movie.embedUrl; 
 
             videoIframe.src = embedUrl;
             modalTitle.textContent = movie.title;
