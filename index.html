@@ -3,340 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Bibliothèque de Films Intégrés</title>
-    <!-- Chargement de Tailwind CSS pour un style moderne et responsive -->
+    <title>StreamVault - Films & Séries</title>
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chargement de la police Open Sans de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* Configuration de base pour le thème sombre */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Bleu très foncé (slate-900) */
+            font-family: 'Open Sans', sans-serif;
+            background-color: #121212; /* Fond très sombre */
+            color: #f0f0f0; /* Texte gris clair */
         }
-        /* Style pour assurer la réactivité de l'iframe (ratio 16:9) */
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio (9 / 16 * 100) */
-            background-color: #000;
+        /* Style de la barre de défilement (optionnel, pour le style) */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none; /* Supprime la bordure par défaut de l'iframe */
+        ::-webkit-scrollbar-thumb {
+            background: #4A90E2;
+            border-radius: 4px;
         }
-        /* Style pour les cartes de films */
-        .film-card {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
-            transition: all 0.3s ease;
-            cursor: pointer; /* Indique que l'élément est cliquable */
-            border: 2px solid transparent;
+        ::-webkit-scrollbar-track {
+            background: #1c1c1c;
         }
+        /* Effet de survol des cartes de films */
         .film-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-            border-color: #3b82f6; /* Bordure bleue au survol */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-        /* Style pour la modale */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95); /* Fond très sombre */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000; /* Assure que la modale est au-dessus de tout */
-        }
-        .modal-content {
-            background-color: #1e293b; /* Gris foncé */
-            max-width: 90vw; /* Utilise 90% de la largeur de l'écran */
-            max-height: 90vh; /* Utilise 90% de la hauteur de l'écran */
-            width: 100%;
-            padding: 1rem;
-            border-radius: 1rem;
-            position: relative;
-            overflow-y: auto;
+        .film-card {
+             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 text-white">
+<body class="min-h-screen">
 
-    <header class="text-center mb-10 bg-gray-800/50 p-6 rounded-xl shadow-lg">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-400">
-            🎬 Ma Salle de Cinéma Personnelle
-        </h1>
-        <p class="text-gray-400 mt-2 text-lg">
-            Cliquez sur une carte pour lancer le film dans le lecteur intégré.
-        </p>
+    <!-- BARRE DE NAVIGATION -->
+    <header class="sticky top-0 z-50 bg-[#1c1c1c] shadow-lg border-b border-gray-800">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between flex-wrap">
+            <!-- Titre du Site -->
+            <h1 class="text-3xl font-bold text-[#4A90E2]">StreamVault</h1>
+
+            <!-- Barre de Recherche -->
+            <div class="flex-grow max-w-lg mx-8 my-2 md:my-0">
+                <input type="text" id="searchInput" placeholder="Rechercher un film..."
+                       class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-200">
+            </div>
+
+            <!-- Bouton Google Form -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfp-2495b9247c43098317a3a696c6b3e6c382173163351221/viewform?usp=sf_link"
+               target="_blank"
+               class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 whitespace-nowrap"
+               aria-label="Proposer un film via Google Form">
+                Proposer un film
+            </a>
+        </nav>
     </header>
 
-    <!-- ZONE DES FILTRES ET DE LA RECHERCHE -->
-    <div class="max-w-7xl mx-auto mb-8 flex flex-col sm:flex-row gap-4">
-        <!-- Barre de Recherche -->
-        <div class="flex-grow">
-            <input
-                type="text"
-                id="search-input"
-                oninput="filterMovies()"
-                placeholder="Rechercher un film par titre..."
-                class="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent border-none outline-none transition duration-150"
-            >
+    <!-- GRILLE D'AFFICHAGE DES FILMS -->
+    <main class="container mx-auto p-6">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-300">Catalogue Populaire</h2>
+
+        <!-- Conteneur de la grille -->
+        <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            <!-- Les cartes de films seront insérées ici par JS -->
         </div>
 
-        <!-- Filtrage par Catégorie -->
-        <div>
-            <select
-                id="category-filter"
-                onchange="filterMovies()"
-                class="w-full sm:w-48 p-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent border-none outline-none cursor-pointer transition duration-150"
-            >
-                <option value="all">Toutes les Catégories</option>
-                <!-- Ajoutez vos catégories ici (Ex: Action, Science-fiction, etc.) -->
-                <option value="action">Action</option>
-                <option value="sci-fi">Science-fiction</option>
-                <option value="animation">Animation</option>
-            </select>
-        </div>
-    </div>
-    <!-- FIN ZONE DES FILTRES ET DE LA RECHERCHE -->
-
-
-    <!--
-        ZONE PRINCIPALE DES FILMS
-        Chaque div film doit être cliquable et appeler openModal.
-    -->
-    <main id="movies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
-
-        <!-- *************************************************************** -->
-        <!-- ********* EXEMPLE 1 : Film intégré (Hunger Games) ************* -->
-        <!-- Note: Nous passons le titre et le lien SRC à la fonction openModal() -->
-        <!-- *************************************************************** -->
-        <div 
-            class="film-card bg-gray-800 p-4 rounded-xl" 
-            data-title="Hunger Games - La Révolte, 2ème Partie (2015)" 
-            data-category="action"
-            onclick="openModal('Hunger Games - La Révolte, 2ème Partie (2015)', 'https://uqload.cx/embed-3mddbqndnykc.html')"
-        >
-            <h2 class="text-xl font-bold mb-2 text-blue-300 truncate">
-                Hunger Games - La Révolte, 2ème Partie (2015)
-            </h2>
-            <div class="video-container rounded-lg overflow-hidden">
-                <!-- Placeholder visuel pour l'aperçu du film -->
-                <img src="https://placehold.co/640x360/1e40af/ffffff?text=Cliquer%20pour%20Regarder" alt="Placeholder pour Hunger Games" class="w-full h-full object-cover">
-            </div>
-            <p class="mt-3 text-sm text-gray-400">
-                Le dernier chapitre de la saga. Catégorie : **Action**.
-            </p>
-        </div>
-        
-        <!-- *************************************************************** -->
-        <!-- ********* EXEMPLE 2 : Film (Science-fiction) ****************** -->
-        <!-- *************************************************************** -->
-        <div 
-            class="film-card bg-gray-800 p-4 rounded-xl" 
-            data-title="Voyage Vers Mars 3000" 
-            data-category="sci-fi"
-            onclick="openModal('Voyage Vers Mars 3000', 'https://placehold.co/1920x1080/10b981/000000?text=LIEN%20DE%20SCI-FI')"
-        >
-            <h2 class="text-xl font-bold mb-2 text-green-300 truncate">
-                Voyage Vers Mars 3000
-            </h2>
-            <div class="video-container rounded-lg overflow-hidden">
-                <img src="https://placehold.co/640x360/065f46/ffffff?text=Cliquer%20pour%20Regarder%20Sci-Fi" alt="Placeholder pour Sci-Fi" class="w-full h-full object-cover">
-            </div>
-            <p class="mt-3 text-sm text-gray-400">
-                Un classique de la science-fiction. Catégorie : **Sci-fi**.
-            </p>
-        </div>
-
-        <!-- *************************************************************** -->
-        <!-- ********* EXEMPLE 3 : Film (Animation) ************************ -->
-        <!-- *************************************************************** -->
-        <div 
-            class="film-card bg-gray-800 p-4 rounded-xl" 
-            data-title="L'Aventure du Petit Dragon" 
-            data-category="animation"
-            onclick="openModal('L\'Aventure du Petit Dragon', 'https://placehold.co/1920x1080/ef4444/000000?text=LIEN%20D\'ANIMATION')"
-        >
-            <h2 class="text-xl font-bold mb-2 text-red-300 truncate">
-                L'Aventure du Petit Dragon
-            </h2>
-            <div class="video-container rounded-lg overflow-hidden">
-                <img src="https://placehold.co/640x360/991b1b/ffffff?text=Cliquer%20pour%20Regarder%20Animé" alt="Placeholder pour Animation" class="w-full h-full object-cover">
-            </div>
-            <p class="mt-3 text-sm text-gray-400">
-                Un film d'animation pour toute la famille. Catégorie : **Animation**.
-            </p>
-        </div>
-
-
-        <!-- *************************************************************** -->
-        <!-- ********* PATRON À DUPLIQUER POUR AJOUTER UN NOUVEAU FILM ***** -->
-        <!-- *************************************************************** -->
-        <div 
-            class="film-card bg-gray-800 p-4 rounded-xl border-4 border-dashed border-yellow-500/50" 
-            data-title="TITRE A CHANGER" 
-            data-category="action"
-            onclick="openModal('TITRE A CHANGER', 'LIEN D\'INTÉGRATION COMPLET ICI')"
-        >
-            <h2 class="text-xl font-bold mb-2 text-yellow-300 truncate">
-                TITRE DU FILM ICI (À DUPLIQUER)
-            </h2>
-            <div class="video-container rounded-lg overflow-hidden">
-                <!-- Vous pouvez remplacer cette image par une vraie vignette si vous en avez une. -->
-                <img src="https://placehold.co/640x360/b45309/ffffff?text=CLIQUEZ%20POUR%20VOIR" alt="Placeholder pour Nouveau Film" class="w-full h-full object-cover">
-            </div>
-            <p class="mt-3 text-sm text-gray-400">
-                Ceci est le patron. Modifiez le titre, la catégorie et surtout le lien dans la fonction **onclick**.
-            </p>
-        </div>
-        <!-- *************************************************************** -->
-        <!-- ******************** FIN DU PATRON D'EXEMPLE ****************** -->
-        <!-- *************************************************************** -->
-        
+        <!-- Message affiché si aucun résultat n'est trouvé -->
+        <p id="noResults" class="hidden text-center text-xl text-gray-400 mt-10">
+            Aucun film ne correspond à votre recherche.
+        </p>
     </main>
 
-    <footer class="text-center mt-12 text-gray-500 text-sm">
-        <p>Bibliothèque de films personnelle. Lecteur intégré par modale.</p>
-    </footer>
-
-    <!-- *************************************************************** -->
-    <!-- ********************* MODALE DU LECTEUR VIDÉO ******************* -->
-    <!-- *************************************************************** -->
-    <div id="movie-modal" class="modal-overlay hidden">
-        <div class="modal-content w-full max-w-4xl lg:max-w-6xl">
-            
-            <!-- Bouton de fermeture -->
-            <button 
-                onclick="closeModal()" 
-                class="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xl transition duration-150 z-20"
-                aria-label="Fermer le lecteur"
-            >
+    <!-- MODALE DE LECTURE (INITIALLEMENT MASQUÉE) -->
+    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden items-center justify-center p-4"
+         onclick="closeModal(event)">
+        <div class="relative w-full max-w-7xl h-full max-h-[90vh]" onclick="event.stopPropagation()">
+            <!-- Bouton de Fermeture -->
+            <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-white text-3xl font-bold z-50 p-2 rounded-full bg-red-600 hover:bg-red-700 transition duration-200"
+                    aria-label="Fermer la fenêtre de lecture">
                 &times;
             </button>
 
-            <h2 id="modal-title" class="text-3xl font-extrabold mb-4 text-blue-400 text-center pt-2">
-                <!-- Le titre du film sera injecté ici -->
-            </h2>
-
-            <!-- Conteneur pour le lecteur (iframe) -->
-            <div class="video-container rounded-xl overflow-hidden shadow-2xl">
-                <iframe
-                    id="modal-iframe"
-                    src=""
-                    frameborder="0"
-                    scrolling="no"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowfullscreen
-                    title="Lecteur Vidéo Intégré"
-                ></iframe>
+            <!-- Conteneur iFrame -->
+            <div class="w-full h-full bg-gray-900 rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
+                <!-- L'iFrame sera chargé dynamiquement ici -->
+                <iframe id="videoIframe"
+                        class="w-full h-full"
+                        src=""
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        loading="lazy">
+                </iframe>
             </div>
-
-            <p class="text-sm text-gray-400 mt-4 text-center">
-                Ce contenu est diffusé via un lecteur intégré (iframe).
-            </p>
+            <!-- Titre du Film dans la Modale -->
+             <div class="mt-4 text-center">
+                <h3 id="modalTitle" class="text-xl font-semibold text-gray-100"></h3>
+            </div>
         </div>
     </div>
-    <!-- *************************************************************** -->
-    <!-- ******************* FIN MODALE DU LECTEUR VIDÉO ***************** -->
-    <!-- *************************************************************** -->
 
+
+    <!-- LOGIQUE JAVASCRIPT -->
     <script>
+        // --- 1. DONNÉES DES FILMS ---
+        const movies = [
+            // Note: Utilisez des ID YouTube pour la lecture
+            {
+                id: 1,
+                title: "Le Voyage de Chihiro",
+                youtubeId: "ByXuk9QqzmE", // Exemple de bande-annonce
+                imageUrl: "https://placehold.co/300x450/4A90E2/ffffff?text=Chihiro+Affiche"
+            },
+            {
+                id: 2,
+                title: "Inception",
+                youtubeId: "8hP9D6BjmPM",
+                imageUrl: "https://placehold.co/300x450/F5A623/ffffff?text=Inception+Affiche"
+            },
+            {
+                id: 3,
+                title: "Parasite",
+                youtubeId: "Wn9x226Z52Y",
+                imageUrl: "https://placehold.co/300x450/7ED321/ffffff?text=Parasite+Affiche"
+            },
+            {
+                id: 4,
+                title: "Interstellar",
+                youtubeId: "qc-iB2H44Xg",
+                imageUrl: "https://placehold.co/300x450/4C4C4C/ffffff?text=Interstellar+Affiche"
+            },
+            {
+                id: 5,
+                title: "Mad Max: Fury Road",
+                youtubeId: "H9P4s50d_A8",
+                imageUrl: "https://placehold.co/300x450/D0021B/ffffff?text=Mad+Max+Affiche"
+            },
+            {
+                id: 6,
+                title: "Arrival",
+                youtubeId: "7W-m81g5j2Q",
+                imageUrl: "https://placehold.co/300x450/9B59B6/ffffff?text=Arrival+Affiche"
+            },
+            {
+                id: 7,
+                title: "Blade Runner 2049",
+                youtubeId: "g61Jd1qF03Y",
+                imageUrl: "https://placehold.co/300x450/3498DB/ffffff?text=Blade+Runner+Affiche"
+            },
+            {
+                id: 8,
+                title: "Whiplash",
+                youtubeId: "zVp32K1d4dM",
+                imageUrl: "https://placehold.co/300x450/1ABC9C/ffffff?text=Whiplash+Affiche"
+            },
+            {
+                id: 9,
+                title: "Everything Everywhere All at Once",
+                youtubeId: "VxS2vJ3_x50",
+                imageUrl: "https://placehold.co/300x450/FFD700/000000?text=EEAAO+Affiche"
+            },
+            {
+                id: 10,
+                title: "Dune (2021)",
+                youtubeId: "8g18jFfC8sM",
+                imageUrl: "https://placehold.co/300x450/000000/ffffff?text=Dune+Affiche"
+            },
+            // NOUVEAU FILM AJOUTÉ PAR L'UTILISATEUR
+            {
+                id: 11,
+                title: "Le Nouveau Film (Exemple)",
+                youtubeId: "81Oa-D0c6gI", // Trailer sécurisé d'un film populaire (Elemental)
+                imageUrl: "https://placehold.co/300x450/4567B4/ffffff?text=Nouveau+Film"
+            }
+            // Ajoutez plus de films ici
+        ];
+
+        const movieGrid = document.getElementById('movieGrid');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+        const videoModal = document.getElementById('videoModal');
+        const videoIframe = document.getElementById('videoIframe');
+        const modalTitle = document.getElementById('modalTitle');
+
+        // --- 2. FONCTIONS DE RENDU ET DE GESTION DES ÉVÉNEMENTS ---
+
         /**
-         * Ouvre la modale du lecteur vidéo et injecte le lien d'intégration.
-         * @param {string} title - Le titre du film.
-         * @param {string} src - Le lien SRC de l'iframe à charger.
+         * Crée et retourne l'élément DOM pour une carte de film.
+         * @param {Object} movie - L'objet film contenant title, imageUrl, et youtubeId.
          */
-        function openModal(title, src) {
-            const modal = document.getElementById('movie-modal');
-            const iframe = document.getElementById('modal-iframe');
-            const titleElement = document.getElementById('modal-title');
+        function createMovieCard(movie) {
+            const card = document.createElement('div');
+            card.className = 'film-card bg-[#1c1c1c] rounded-xl overflow-hidden shadow-xl cursor-pointer hover:shadow-[#4A90E2]/40 transition duration-300';
+            card.setAttribute('data-title', movie.title);
+            card.setAttribute('data-youtube-id', movie.youtubeId);
 
-            // 1. Injecte le contenu
-            titleElement.textContent = title;
-            iframe.src = src; // Charge la vidéo
+            card.innerHTML = `
+                <div class="aspect-w-2 aspect-h-3 overflow-hidden">
+                    <img src="${movie.imageUrl}" alt="Affiche du film ${movie.title}" class="w-full h-auto object-cover transform hover:scale-105 transition duration-500" onerror="this.onerror=null;this.src='https://placehold.co/300x450/333333/f0f0f0?text=Affiche+Non+Trouvée';">
+                </div>
+                <div class="p-3 text-center">
+                    <h3 class="text-lg font-medium truncate">${movie.title}</h3>
+                </div>
+            `;
 
-            // 2. Affiche la modale
-            modal.classList.remove('hidden');
+            // Ajoute l'écouteur d'événement pour ouvrir la modale
+            card.addEventListener('click', () => openModal(movie));
 
-            // Empêche le défilement du corps de la page
-            document.body.style.overflow = 'hidden';
-
-            // Ajoute un écouteur pour fermer avec la touche ESC
-            document.addEventListener('keydown', handleEscape);
+            return card;
         }
 
         /**
-         * Ferme la modale du lecteur vidéo.
+         * Affiche tous les films dans la grille.
+         * @param {Array<Object>} filmsToDisplay - Liste des films à afficher.
          */
-        function closeModal() {
-            const modal = document.getElementById('movie-modal');
-            const iframe = document.getElementById('modal-iframe');
-
-            // 1. Cache la modale
-            modal.classList.add('hidden');
-
-            // 2. Stoppe la vidéo en retirant la source de l'iframe
-            // IMPORTANT : Ceci stoppe la lecture audio/vidéo !
-            iframe.src = ""; 
-
-            // Rétablit le défilement du corps de la page
-            document.body.style.overflow = '';
-
-            // Retire l'écouteur de la touche ESC
-            document.removeEventListener('keydown', handleEscape);
+        function renderMovies(filmsToDisplay) {
+            movieGrid.innerHTML = ''; // Nettoie la grille
+            if (filmsToDisplay.length === 0) {
+                noResults.classList.remove('hidden');
+                movieGrid.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                movieGrid.classList.remove('hidden');
+                filmsToDisplay.forEach(movie => {
+                    movieGrid.appendChild(createMovieCard(movie));
+                });
+            }
         }
 
         /**
-         * Gère la fermeture avec la touche Échappe (ESC).
+         * Filtre les films en fonction de la saisie de l'utilisateur.
          */
-        function handleEscape(event) {
-            if (event.key === 'Escape') {
+        function filterMovies() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+
+            const filteredMovies = movies.filter(movie =>
+                movie.title.toLowerCase().includes(searchTerm)
+            );
+
+            renderMovies(filteredMovies);
+        }
+
+        /**
+         * Ouvre la modale de lecture avec le contenu du film sélectionné.
+         * @param {Object} movie - Le film à lire.
+         */
+        function openModal(movie) {
+            // Construit l'URL de l'embed YouTube avec l'autoplay
+            const embedUrl = `https://www.youtube.com/embed/${movie.youtubeId}?autoplay=1&controls=1&modestbranding=1&rel=0`;
+
+            videoIframe.src = embedUrl;
+            modalTitle.textContent = movie.title;
+            videoModal.classList.remove('hidden');
+            videoModal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Empêche le défilement du corps
+        }
+
+        /**
+         * Ferme la modale de lecture.
+         * @param {Event} [event] - L'événement de clic (pour gérer le clic en arrière-plan).
+         */
+        function closeModal(event) {
+            // Vérifie si l'événement est défini et si la cible est le conteneur principal (pour fermer en cliquant à côté)
+            if (event && event.target !== videoModal) {
+                return;
+            }
+
+            videoIframe.src = ""; // Arrête la vidéo en cours
+            videoModal.classList.add('hidden');
+            videoModal.classList.remove('flex');
+            document.body.style.overflow = 'auto'; // Rétablit le défilement
+        }
+
+        // --- 3. INITIALISATION ET ÉCOUTEURS D'ÉVÉNEMENTS ---
+
+        // Écouteur pour la barre de recherche
+        searchInput.addEventListener('input', filterMovies);
+
+        // Écouteur pour fermer la modale avec la touche ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !videoModal.classList.contains('hidden')) {
                 closeModal();
             }
-        }
-        
-        // Fonction de filtrage (inchangée, mais mise à jour pour le nouveau HTML des cartes)
-        function filterMovies() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('category-filter').value;
-            const films = document.getElementById('movies-container').children;
-
-            for (let i = 0; i < films.length; i++) {
-                const film = films[i];
-                
-                if (film.nodeType !== 1 || !film.hasAttribute('data-title')) continue;
-
-                const title = film.getAttribute('data-title').toLowerCase();
-                const filmCategory = film.getAttribute('data-category').toLowerCase();
-                
-                const titleMatch = title.includes(searchTerm);
-                const categoryMatch = (category === 'all' || filmCategory === category);
-
-                if (titleMatch && categoryMatch) {
-                    film.style.display = 'block'; 
-                } else {
-                    film.style.display = 'none';  
-                }
-            }
-        }
-
-        // Ajout d'un écouteur pour fermer la modale si l'utilisateur clique en dehors de son contenu
-        document.addEventListener('DOMContentLoaded', () => {
-            const modalOverlay = document.getElementById('movie-modal');
-            modalOverlay.addEventListener('click', (event) => {
-                // Si l'utilisateur clique sur l'overlay (l'extérieur de la modale)
-                if (event.target === modalOverlay) {
-                    closeModal();
-                }
-            });
         });
-    </script>
 
+        // Afficher les films au chargement
+        window.onload = () => {
+            renderMovies(movies);
+        };
+    </script>
 </body>
 </html>
